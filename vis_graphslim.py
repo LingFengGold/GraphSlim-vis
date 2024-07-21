@@ -36,46 +36,47 @@ reduction_rate = st.sidebar.selectbox(
 )
 
 st.markdown('### Original Graph')
-dataset = Planetoid(root='', name='Cora')
-data = dataset[0]
+with st.button('Show Original Graph'):
+    dataset = Planetoid(root='', name='Cora')
+    data = dataset[0]
 
-G = to_networkx(data, to_undirected=True)
-node_labels = {i: int(data.y[i]) for i in range(data.num_nodes)}
-unique_labels = list(set(node_labels.values()))
-colors = plt.cm.get_cmap('jet', len(unique_labels))
-color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
-node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
-nx.set_node_attributes(G, node_colors, "color")
+    G = to_networkx(data, to_undirected=True)
+    node_labels = {i: int(data.y[i]) for i in range(data.num_nodes)}
+    unique_labels = list(set(node_labels.values()))
+    colors = plt.cm.get_cmap('jet', len(unique_labels))
+    color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
+    node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
+    nx.set_node_attributes(G, node_colors, "color")
 
-net = Network(
-            height='400px',
-            width='100%'
-            )
+    net = Network(
+                height='400px',
+                width='100%'
+                )
 
-net.from_nx(G)
-net.repulsion()
+    net.from_nx(G)
+    net.repulsion()
 
-# net.repulsion(
-#             node_distance=420,
-#             central_gravity=0.33,
-#             spring_length=110,
-#             spring_strength=0.10,
-#             damping=0.95
-#             )
+    # net.repulsion(
+    #             node_distance=420,
+    #             central_gravity=0.33,
+    #             spring_length=110,
+    #             spring_strength=0.10,
+    #             damping=0.95
+    #             )
 
-# try:
-#     path = 'tmp'
-#     net.save_graph(f'{path}/pyvis_graph.html')
-#     HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+    # try:
+    #     path = 'tmp'
+    #     net.save_graph(f'{path}/pyvis_graph.html')
+    #     HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
 
-#     # Save and read graph as HTML file (locally)
-# except:
-path = 'html_files'
-net.save_graph(f'{path}/pyvis_graph.html')
-HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
-# Load HTML file in HTML component for display on Streamlit page
+    #     # Save and read graph as HTML file (locally)
+    # except:
+    path = 'html_files'
+    net.save_graph(f'{path}/pyvis_graph.html')
+    HtmlFile = open(f'{path}/pyvis_graph.html', 'r', encoding='utf-8')
+    # Load HTML file in HTML component for display on Streamlit page
 
-components1 = components.html(HtmlFile.read(), height=500)
+    components1 = components.html(HtmlFile.read(), height=500)
 
 
 
