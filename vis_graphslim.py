@@ -35,8 +35,46 @@ reduction_rate = st.sidebar.selectbox(
     ('0.1', '0.25', '0.5')
 )
 
+
+st.markdown('### Reduced Graph')
+adj_path = f'reduced_graph/{method}/adj_cora_{reduction_rate}_1.pt'
+label_path = f'reduced_graph/{method}/label_cora_{reduction_rate}_1.pt'
+
+adj_matrix = torch.load(adj_path, map_location=torch.device('cpu')).to_dense().numpy()  
+node_labels = torch.load(label_path, map_location=torch.device('cpu')).numpy()  
+
+G = nx.from_numpy_array(adj_matrix)
+node_labels_dict = {i: int(node_labels[i]) for i in range(len(node_labels))}
+unique_labels = list(set(node_labels_dict.values()))
+colors = plt.cm.get_cmap('jet', len(unique_labels))
+color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
+node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
+nx.set_node_attributes(G, node_colors, 'color')
+
+net = Network(
+            height='400px',
+            width='100%'
+            )
+
+net.from_nx(G)
+net.repulsion()
+# try:
+#     path = '/tmp'
+#     net.save_graph(f'{path}/reduced_graph.html')
+#     HtmlFile = open(f'{path}/reduced_graph.html', 'r', encoding='utf-8')
+#     # Save and read graph as HTML file (locally)
+# except:
+path = 'html_files'
+net.save_graph(f'{path}/reduced_graph.html')
+HtmlFile = open(f'{path}/reduced_graph.html', 'r', encoding='utf-8')
+# Load HTML file in HTML component for display on Streamlit page
+
+components2 = components.html(HtmlFile.read(), height=500)
+
+st.balloons()
+
 st.markdown('### Original Graph')
-with st.button('Show Original Graph'):
+if st.button('Show Original Graph'):
     dataset = Planetoid(root='', name='Cora')
     data = dataset[0]
 
@@ -77,44 +115,3 @@ with st.button('Show Original Graph'):
     # Load HTML file in HTML component for display on Streamlit page
 
     components1 = components.html(HtmlFile.read(), height=500)
-
-
-
-
-
-st.markdown('### Reduced Graph')
-adj_path = f'reduced_graph/{method}/adj_cora_{reduction_rate}_1.pt'
-label_path = f'reduced_graph/{method}/label_cora_{reduction_rate}_1.pt'
-
-adj_matrix = torch.load(adj_path, map_location=torch.device('cpu')).to_dense().numpy()  
-node_labels = torch.load(label_path, map_location=torch.device('cpu')).numpy()  
-
-G = nx.from_numpy_array(adj_matrix)
-node_labels_dict = {i: int(node_labels[i]) for i in range(len(node_labels))}
-unique_labels = list(set(node_labels_dict.values()))
-colors = plt.cm.get_cmap('jet', len(unique_labels))
-color_mapping = {label: colors(i) for i, label in enumerate(unique_labels)}
-node_colors = {i: mcolors.to_hex(color_mapping[node_labels[i]]) for i in G.nodes}
-nx.set_node_attributes(G, node_colors, 'color')
-
-net = Network(
-            height='400px',
-            width='100%'
-            )
-
-net.from_nx(G)
-net.repulsion()
-# try:
-#     path = '/tmp'
-#     net.save_graph(f'{path}/reduced_graph.html')
-#     HtmlFile = open(f'{path}/reduced_graph.html', 'r', encoding='utf-8')
-#     # Save and read graph as HTML file (locally)
-# except:
-path = 'html_files'
-net.save_graph(f'{path}/reduced_graph.html')
-HtmlFile = open(f'{path}/reduced_graph.html', 'r', encoding='utf-8')
-# Load HTML file in HTML component for display on Streamlit page
-
-components2 = components.html(HtmlFile.read(), height=500)
-
-st.balloons()
